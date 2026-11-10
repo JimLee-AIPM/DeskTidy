@@ -3,7 +3,7 @@ import XCTest
 
 final class AppInfoTests: XCTestCase {
     func testDisplayNameIsSet() {
-        XCTAssertEqual(AppInfo.displayName, "桌面清理")
+        XCTAssertEqual(AppInfo.displayName, "DeskTidy")
     }
 
     func testVersionHasThreeParts() {

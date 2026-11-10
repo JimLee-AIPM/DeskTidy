@@ -214,6 +214,13 @@ struct SettingsRootView: View {
                         .accessibilityHidden(item != tab)
                 }
             }
+
+            // 每一页底部都有，点了用默认浏览器打开官网
+            if let url = URL(string: AppInfo.websiteURL) {
+                Link("访问官网 →", destination: url)
+                    .font(.caption)
+                    .padding(.bottom, 14)
+            }
         }
         .frame(width: settingsPageWidth)
         .modifier(PluginStyle(settings: settings, cornerRadius: SettingsWindowController.cornerRadius))
@@ -279,22 +286,24 @@ struct CleanSettingsPage: View {
                 }
             }
 
-            SettingsGroup(header: "很久没用的应用", footer: "清理后，如果有很久没用的应用，会问你要不要退出它们。不会自动退出。") {
-                SettingsRow(title: "多久没用算很久", symbol: "hourglass", color: .indigo) {
-                    SettingsMenu(
-                        title: "多久没用算很久",
-                        selection: $settings.idleThreshold,
-                        options: IdleThreshold.allCases,
-                        label: \.label
-                    )
-                }
-                SettingsRow(title: "提醒频率", symbol: "bell.badge.fill", color: .orange, showsDivider: false) {
-                    SettingsMenu(
-                        title: "提醒频率",
-                        selection: $settings.idleReminderFrequency,
-                        options: IdleReminderFrequency.allCases,
-                        label: \.label
-                    )
+            if Distribution.canQuitOtherApps {
+                SettingsGroup(header: "很久没用的应用", footer: "清理后，如果有很久没用的应用，会问你要不要退出它们。不会自动退出。") {
+                    SettingsRow(title: "多久没用算很久", symbol: "hourglass", color: .indigo) {
+                        SettingsMenu(
+                            title: "多久没用算很久",
+                            selection: $settings.idleThreshold,
+                            options: IdleThreshold.allCases,
+                            label: \.label
+                        )
+                    }
+                    SettingsRow(title: "提醒频率", symbol: "bell.badge.fill", color: .orange, showsDivider: false) {
+                        SettingsMenu(
+                            title: "提醒频率",
+                            selection: $settings.idleReminderFrequency,
+                            options: IdleReminderFrequency.allCases,
+                            label: \.label
+                        )
+                    }
                 }
             }
         }

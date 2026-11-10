@@ -15,3 +15,7 @@ DerivedData/
 
 # Python
 __pycache__/
+.build-appstore/
+
+# App Store 商店素材（截图、说明文件），不放进源码仓库
+AppStore截图/

@@ -34,6 +34,16 @@
   DEVELOPER_ID="Developer ID Application: 你的名字 (团队ID)" NOTARY_PROFILE=desktidy ./scripts/package-release.sh
   ```
 
+## 做成 App Store 上架版本
+
+```bash
+./scripts/package-appstore.sh
+```
+
+生成 `build/appstore/DeskTidy.app`（开启 App 沙盒，苹果芯片和 Intel 都能用）。钥匙串里有 "Apple Distribution" 和 "Mac Installer Distribution" 证书时，还会生成可以直接拖进 Transporter 上传的 `build/appstore/DeskTidy-版本号.pkg`；没有证书时只生成本地签名的 .app，可以先双击自测。
+
+App Store 版和其他版本的唯一功能差别：沙盒里不能退出别的应用，所以面板里的 ✕ 退出按钮、"很久没用的应用"提醒和对应设置都不显示，收起/恢复不受影响（见 `Sources/DeskTidy/Distribution.swift`）。Bundle ID 读 `Packaging/Info.plist`，要换就用 `BUNDLE_ID=新ID ./scripts/package-appstore.sh`。
+
 应用图标的原图是 `Packaging/AppIcon.png`，由 `scripts/make-icon.py` 画出（需要 `pip install pillow`），打包时会自动转成 Mac 图标格式。
 
 ## 文档

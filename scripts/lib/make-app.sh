@@ -4,6 +4,8 @@
 #       make_app universal  同时编译苹果芯片和 Intel 芯片，发给别人用
 
 APP="build/DeskTidy.app"
+# 额外的编译参数，例如 App Store 版用 "-Xswiftc -DAPP_STORE --scratch-path .build-appstore"
+EXTRA_BUILD_FLAGS="${EXTRA_BUILD_FLAGS:-}"
 VERSION="$(sed -n 's/.*version = "\(.*\)".*/\1/p' Sources/DeskTidyCore/AppInfo.swift)"
 
 build_binary() {
@@ -12,8 +14,8 @@ build_binary() {
         local slices=()
         for arch in arm64 x86_64; do
             echo "正在编译 $arch 版本..."
-            if swift build -c release --arch "$arch"; then
-                BIN_DIR="$(swift build -c release --arch "$arch" --show-bin-path)"
+            if swift build -c release --arch "$arch" $EXTRA_BUILD_FLAGS; then
+                BIN_DIR="$(swift build -c release --arch "$arch" $EXTRA_BUILD_FLAGS --show-bin-path)"
                 # 新版 Xcode 的编译系统把不同芯片的结果放在同一个文件夹，下一次编译会覆盖，所以马上存一份
                 cp "$BIN_DIR/DeskTidy" "build/DeskTidy-$arch"
                 slices+=("build/DeskTidy-$arch")
@@ -29,8 +31,8 @@ build_binary() {
         rm -f "${slices[@]}"
     else
         echo "正在编译（第一次可能要一两分钟）..."
-        swift build -c release
-        BIN_DIR="$(swift build -c release --show-bin-path)"
+        swift build -c release $EXTRA_BUILD_FLAGS
+        BIN_DIR="$(swift build -c release $EXTRA_BUILD_FLAGS --show-bin-path)"
         cp "$BIN_DIR/DeskTidy" build/DeskTidy-binary
     fi
 }

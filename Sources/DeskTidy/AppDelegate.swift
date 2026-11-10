@@ -75,7 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private static let brandIcon = NSImage(systemSymbolName: "sparkles", accessibilityDescription: AppInfo.displayName)
-    private static var brandToolTip: String { "\(AppInfo.displayName)（\(AppInfo.brandName)）" }
+    private static var brandToolTip: String { AppInfo.displayName }
 
     private func openSettings() {
         panel?.close()
@@ -145,6 +145,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showIdleApps() {
         usage.noteSeen(runningApps.apps)
+        // App Store 版不能退出别的应用，这个提醒窗口的唯一作用就是退出，所以不弹
+        guard Distribution.canQuitOtherApps else { return }
         let threshold = settings.idleThreshold
         let idle = IdleAppFinder.idleApps(
             running: runningApps.apps,

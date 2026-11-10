@@ -246,7 +246,7 @@ struct PanelView: View {
                 .foregroundStyle(.secondary)
                 .transition(.opacity)
         } else {
-            let showsQuit = isHovered && QuitRules.canQuitFromPanel(app)
+            let showsQuit = isHovered && canQuit(app)
             ZStack(alignment: .trailing) {
                 if let lastUsed = lastUsedText(for: app) {
                     Text(lastUsed)
@@ -254,7 +254,7 @@ struct PanelView: View {
                         .foregroundStyle(.secondary)
                         .opacity(showsQuit ? 0 : 1)
                 }
-                if QuitRules.canQuitFromPanel(app) {
+                if canQuit(app) {
                     Button {
                         requestQuit(app)
                     } label: {
@@ -270,6 +270,10 @@ struct PanelView: View {
             }
             .transition(.opacity)
         }
+    }
+
+    private func canQuit(_ app: RunningApp) -> Bool {
+        Distribution.canQuitOtherApps && QuitRules.canQuitFromPanel(app)
     }
 
     private func requestQuit(_ app: RunningApp) {
@@ -320,10 +324,11 @@ struct PanelView: View {
     }
 
     private var runningAppsHint: String {
+        let quitHint = Distribution.canQuitOtherApps ? "双击打开，悬停点 ✕ 退出应用" : "双击打开"
         if let scene = scenes.selectedScene {
-            return "双击打开，悬停点 ✕ 退出应用；打勾 = 在「\(scene.name)」中保留"
+            return "\(quitHint)；打勾 = 在「\(scene.name)」中保留"
         }
-        return "双击打开，悬停点 ✕ 退出应用；选一个场景才能勾选保留"
+        return "\(quitHint)；选一个场景才能勾选保留"
     }
 }
 

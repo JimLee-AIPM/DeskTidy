@@ -17,7 +17,7 @@ struct WelcomeView: View {
                     .resizable()
                     .frame(width: 52, height: 52)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("\(AppInfo.displayName)已经在运行")
+                    Text("\(AppInfo.displayName) 已经在运行")
                         .font(.title3.weight(.semibold))
                     Text("一键收起暂时不用的应用，让桌面清爽")
                         .font(.callout)
