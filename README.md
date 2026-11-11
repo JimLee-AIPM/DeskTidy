@@ -26,6 +26,8 @@ DeskTidy 有两个版本，核心功能一样：
 | 在面板里直接退出其他应用 | — | ✓ |
 | "很久没用的应用"提醒 | — | ✓ |
 
+两个版本共用同一份源码，各自的说明和材料分别在 [`DeskTidy/`](DeskTidy/) 和 [`DeskTidy-AppStore/`](DeskTidy-AppStore/) 文件夹里。
+
 App Store 要求应用运行在沙盒里，沙盒不允许一个应用退出其他应用，所以后两项只有完整版有（见 `Sources/DeskTidy/Distribution.swift`）。
 
 ## 许可证
@@ -107,4 +109,6 @@ Vendor/KeyboardShortcuts/  快捷键库（MIT，改了一处资源查找位置�
 Packaging/                 Info.plist、沙盒配置、图标原图、安装说明
 scripts/                   安装和打包脚本
 docs/                      需求文档、技术方案、任务清单
+DeskTidy/                  正式版（完整版）的说明：功能、怎么打安装包
+DeskTidy-AppStore/         App Store 版的上架材料：商店截图、宣传图、35 条上架资料
 ```

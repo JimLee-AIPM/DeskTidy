@@ -19,3 +19,10 @@ __pycache__/
 
 # App Store 商店素材（截图、说明文件），不放进源码仓库
 AppStore截图/
+
+# 各版本文件夹里只放说明和素材；安装包和含私人信息的本地文件不进仓库
+/DeskTidy/*.dmg
+/DeskTidy-AppStore/*.app/
+/DeskTidy-AppStore/*.pkg
+/DeskTidy-AppStore/AppIcon.png
+/DeskTidy-AppStore/*-本地.md
