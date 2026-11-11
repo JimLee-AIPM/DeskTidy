@@ -1,117 +1,110 @@
-# 桌面清理（DeskTidy，暂定名）
+# DeskTidy
 
-一个 Mac 菜单栏小工具：给同时开着一堆 AI 工具干活的人，一键收起眼前不需要的应用，让屏幕清爽、切换不掉帧。
+Mac 菜单栏小工具：一键收起眼前用不到的应用，让屏幕只留下此刻要用的。
 
-当前状态：**开发中**。第一版功能已完成，正在自己试用。
+当前版本：**1.0.0**　·　系统要求：macOS 13 或更高版本（Apple 芯片和 Intel 芯片都支持）
 
-内置番茄钟：面板里点"开始专注"，屏幕角落出现玻璃小时钟；专注到点后提醒休息，休息时毛玻璃铺满屏幕（随时可跳过，不会收起或关闭任何应用）。时长和提醒方式在设置窗口的"专注"里改（面板最下面点"设置…"，或在面板里按 ⌘,）。
+## 能做什么
 
-打开面板、设置这些窗口时有浅色和深色两套底色，默认跟着系统换。在设置的「清理」里，圆盘上选中的颜色会马上变成自选的底色。
+- **一键清理**：一个快捷键（默认 ⌥⌘K，可自定义），把用不到的应用收起来。只隐藏，不关闭，应用在后台照常运行。
+- **一键恢复**：把刚才收起的应用全部放回原处。
+- **工作场景**：每个场景记着清理时要保留哪些应用，内置"AI 工作""做设计""开会"三个，可以自己增删。
+- **番茄钟**：专注时屏幕角落有小时钟，到点提醒休息，休息时毛玻璃铺满屏幕，随时可以跳过。
+- **外观**：浅色、深色跟随系统，也可以在圆盘上自选底色。
 
-## 装成应用（日常使用）
+DeskTidy 不联网，不收集任何数据，详见[隐私政策](https://github.com/JimLee-AIPM/DeskTidy-Release/blob/main/PRIVACY.md)。
+
+## 下载
+
+安装包、版本区别和问题反馈都在 [DeskTidy-Release](https://github.com/JimLee-AIPM/DeskTidy-Release)。
+
+DeskTidy 有两个版本，核心功能一样：
+
+| | App Store 版 | 完整版 |
+| --- | :---: | :---: |
+| 一键清理、一键恢复、工作场景、番茄钟 | ✓ | ✓ |
+| 在面板里直接退出其他应用 | — | ✓ |
+| "很久没用的应用"提醒 | — | ✓ |
+
+App Store 要求应用运行在沙盒里，沙盒不允许一个应用退出其他应用，所以后两项只有完整版有（见 `Sources/DeskTidy/Distribution.swift`）。
+
+## 许可证
+
+源码公开，但**仅限非商业使用**，采用 [PolyForm Noncommercial 1.0.0](LICENSE.md)。商业使用请先联系作者获得授权。
+
+`Vendor/KeyboardShortcuts` 是第三方开源库，仍按它自己的 MIT 许可证发布。
+
+---
+
+## 开发
+
+需要 Xcode 15.3 或更高版本。第一次使用时，让终端用 Xcode 自带的工具：
+
+```bash
+sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+sudo xcodebuild -license accept
+```
+
+快捷键库 KeyboardShortcuts 已放在 `Vendor/` 里，不需要联网下载。
+
+### 装到自己的电脑上
 
 ```bash
 ./scripts/build-app.sh
 ```
 
-脚本会编译、打包出 `DeskTidy.app`，装进"应用程序"文件夹并启动。之后可以关掉终端，DeskTidy 继续在菜单栏运行；下次在启动台或聚焦搜索里搜"DeskTidy"打开。改了代码后重新运行这条命令即可更新。
+编译、打包出 `DeskTidy.app`，装进"应用程序"文件夹并启动。改了代码后重新运行即可更新。
 
-第一次以应用方式启动时，会自动搬来之前用 `swift run` 时的设置（场景、提示音、快捷键），只搬一次。
+### 打包
 
-## 做成安装包发给别人
+| 命令 | 用途 | 产物 |
+| --- | --- | --- |
+| `./scripts/package-release.sh` | 完整版安装包，发给别人或放到 Releases | `build/DeskTidy（测试版）.dmg` |
+| `./scripts/package-appstore.sh` | App Store 版（开启 App 沙盒） | `build/appstore/DeskTidy.app`，有证书时另有 `.pkg` |
+
+**完整版签名与公证**：没有开发者证书时用临时签名，对方第一次打开需要在"系统设置 → 隐私与安全性"里点"仍要打开"。有 "Developer ID Application" 证书时：
 
 ```bash
-./scripts/package-release.sh
+xcrun notarytool store-credentials desktidy --apple-id 你的AppleID --team-id 团队ID
+DEVELOPER_ID="Developer ID Application: 你的名字 (团队ID)" NOTARY_PROFILE=desktidy ./scripts/package-release.sh
 ```
 
-生成 `build/DeskTidy（测试版）.dmg`（里面有应用和安装说明，做完会自动在访达里选中它），苹果芯片和 Intel 芯片的 Mac 都能用（需要 macOS 13 以上）。把这个文件发给对方，对方双击打开，把 DeskTidy 拖进"应用程序"即可。
+**App Store 版**：钥匙串里有 "Apple Distribution" 和 "Mac Installer Distribution" 证书时，会生成可以拖进 Transporter 上传的 `build/appstore/DeskTidy-版本号.pkg`；没有证书时只生成本地签名的 `.app`，可以先双击自测。构建号按打包时间自动生成，每次上传递增。Bundle ID 读 `Packaging/Info.plist`，要换就用 `BUNDLE_ID=新ID ./scripts/package-appstore.sh`。
 
-- **没有苹果开发者账号（默认）**：用免费的临时签名。对方第一次打开时会提示"无法验证开发者"，需要在"系统设置 → 隐私与安全性"里点一次"仍要打开"。安装包里附了说明文件《打不开时看这里》。
-- **有苹果开发者账号（每年 99 美元）**：对方双击就能直接打开，没有任何提示。先在钥匙串里装好 "Developer ID Application" 证书，并保存一次公证凭据：
+版本号写在 `Sources/DeskTidyCore/AppInfo.swift` 的 `AppInfo.version`，打包时会写进安装包。
 
-  ```bash
-  xcrun notarytool store-credentials desktidy --apple-id 你的AppleID --team-id 团队ID
-  DEVELOPER_ID="Developer ID Application: 你的名字 (团队ID)" NOTARY_PROFILE=desktidy ./scripts/package-release.sh
-  ```
-
-## 做成 App Store 上架版本
+### 开发时直接运行
 
 ```bash
-./scripts/package-appstore.sh
-```
-
-生成 `build/appstore/DeskTidy.app`（开启 App 沙盒，苹果芯片和 Intel 都能用）。钥匙串里有 "Apple Distribution" 和 "Mac Installer Distribution" 证书时，还会生成可以直接拖进 Transporter 上传的 `build/appstore/DeskTidy-版本号.pkg`；没有证书时只生成本地签名的 .app，可以先双击自测。
-
-App Store 版和其他版本的唯一功能差别：沙盒里不能退出别的应用，所以面板里的 ✕ 退出按钮、"很久没用的应用"提醒和对应设置都不显示，收起/恢复不受影响（见 `Sources/DeskTidy/Distribution.swift`）。Bundle ID 读 `Packaging/Info.plist`，要换就用 `BUNDLE_ID=新ID ./scripts/package-appstore.sh`。
-
-应用图标的原图是 `Packaging/AppIcon.png`，由 `scripts/make-icon.py` 画出（需要 `pip install pillow`），打包时会自动转成 Mac 图标格式。
-
-## 文档
-
-- [需求文档](docs/Mac桌面清理工具需求文档.md)
-- [技术方案](docs/Mac桌面清理工具技术方案.md)
-- [任务清单](docs/Mac桌面清理工具任务清单.md)
-
-## 运行环境
-
-- macOS 13 或更高版本
-- Xcode 15.3 或更高版本（从 App Store 免费安装）
-
-## 在本地运行（开发时）
-
-这种方式启动的 DeskTidy 挂在终端下面，关掉终端窗口它也会退出。日常使用请用上面的"装成应用"。
-
-```bash
-# 第一次使用：让终端使用 Xcode 自带的工具，并同意 Xcode 的许可协议
-sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
-sudo xcodebuild -license accept
-
-# 进入项目目录后运行
 swift run DeskTidy
 ```
 
-第一次运行需要编译，可能需要一两分钟。快捷键库 KeyboardShortcuts 已放在 `Vendor/` 里，不需要联网下载。
+这种方式启动的 DeskTidy 挂在终端下面，关掉终端它也会退出。也可以 `open Package.swift` 用 Xcode 打开，选 `DeskTidy` 和 `My Mac` 后点运行。
 
-运行成功后：
-- 终端显示：`桌面清理 0.1.0 已启动，请看屏幕右上角菜单栏里的星星图标。`
-- 屏幕右上角菜单栏出现一个三颗星星的黑白小图标；Dock 里没有图标。
-- 点击图标，弹出面板，有"一键清理""一键恢复""退出"三个按钮（前两个暂时还不工作）。
-
-退出：点面板里的"退出"，或在终端按 `Ctrl + C`。
-
-## 运行测试
+### 运行测试
 
 ```bash
 swift test
 ```
 
-输出中能看到 `Executed N tests, with 0 failures`（N 是测试数量，会随开发增加）即为通过。之后可能还有一行 `Test run with 0 tests passed`，属于正常现象。
+看到 `Executed N tests, with 0 failures` 即为通过。
 
-## 用 Xcode 打开
+### 应用图标
 
-```bash
-open Package.swift
-```
+原图是 `Packaging/AppIcon.png`，由 `scripts/make-icon.py` 画出（需要 `pip install pillow`），打包时自动转成 Mac 图标格式。
 
-Xcode 打开后，在顶部选择 `DeskTidy` 和 `My Mac`，点运行按钮（▶）。
-
-## 目录结构
+### 目录结构
 
 ```text
 Package.swift              项目配置：名字、支持的系统版本、依赖库
 Sources/
-  DeskTidy/                应用本体：菜单栏图标、面板界面、启动设置
-    main.swift             应用入口：启动应用，并设置不在 Dock 显示图标
-    AppDelegate.swift      创建菜单栏图标，点击时弹出面板
-    SettingsWindowController.swift  设置窗口（透明玻璃，场景、清理、专注、快捷键四个标签）
-    Focus*.swift           番茄钟：计时、角落小时钟、什么时候提醒
-    BreakOverlayPresenter.swift  休息时铺满屏幕的毛玻璃
+  DeskTidy/                应用本体：菜单栏图标、面板、设置窗口、番茄钟界面
+    Distribution.swift     App Store 版和完整版的功能差别
     Views/                 界面
-  DeskTidyCore/            核心逻辑：清理规则、场景、番茄钟计时规则、数据存储（不含界面）
-Tests/
-  DeskTidyCoreTests/       核心逻辑的自动测试
-Vendor/KeyboardShortcuts/  快捷键库（开源，改了一处资源查找位置，见其中的 README）
-Packaging/                 应用信息（Info.plist）、图标原图、安装说明
-scripts/                   打包脚本：build-app.sh 装到自己电脑，package-release.sh 做安装包
+  DeskTidyCore/            核心逻辑：清理规则、场景、番茄钟计时、数据存储（不含界面）
+Tests/DeskTidyCoreTests/   核心逻辑的自动测试
+Vendor/KeyboardShortcuts/  快捷键库（MIT，改了一处资源查找位置，见其中的 README）
+Packaging/                 Info.plist、沙盒配置、图标原图、安装说明
+scripts/                   安装和打包脚本
 docs/                      需求文档、技术方案、任务清单
 ```
